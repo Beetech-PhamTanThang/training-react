@@ -2,13 +2,16 @@ import React from 'react';
 import 'App.css';
 import {AppProvider} from "./context/ThemeContext";
 import Router from "routes/Routes";
+import {AuthProvider} from "./context/auth/AuthContext";
 
 
 function App() {
     return (
-        <AppProvider>
-            <Router/>
-        </AppProvider>
+        <AuthProvider>
+            <AppProvider>
+                <Router/>
+            </AppProvider>
+        </AuthProvider>
     );
 }
 

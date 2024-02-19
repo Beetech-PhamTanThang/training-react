@@ -19,7 +19,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({children})
     const contextValue = useMemo(() => ({
         theme,
         setTheme
-    }), [theme, setTheme]);
+    }), [theme]);
 
     return (
         <ThemeProvider theme={theme === DARK_MODE ? darkTheme : lightTheme}>

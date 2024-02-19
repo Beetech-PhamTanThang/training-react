@@ -1,7 +1,12 @@
 import React from "react";
 import styled from "styled-components";
+import {useFormik} from "formik";
+import * as Yup from 'yup';
+import axiosClient from "../../services/Axios";
+import {useAuth} from "../../hooks/useAuth";
 
 const Wrapper = styled.section`
+  margin-top: 20vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,7 +20,7 @@ const Form = styled.form`
 
 const FormWrapper = styled.div`
   border: 1px solid darkgray;
-  box-shadow: lightblue 0px 10px 10px;
+  box-shadow: lightblue 0 10px 10px;
   border-radius: 1rem;
   width: 100%;
   max-width: 15vw;
@@ -26,7 +31,7 @@ const FormWrapper = styled.div`
 `;
 
 const Label = styled.label`
-  font-size: .8rem;
+  font-size: 1rem;
   padding-bottom: .2rem;
 `;
 
@@ -35,7 +40,7 @@ const Input = styled.input`
   padding: 0.8rem 1rem;
   background: #f9f9fa;
   color: #000;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.5rem;
   border-radius: 4px;
   outline: 0;
   border: 1px solid rgba(245, 245, 245, 0.7);
@@ -74,35 +79,92 @@ const Image = styled.div`
 
 const Title = styled.h2`
   font-weight: normal;
-  color: #2a2a29;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
   text-align: left;
 `;
+
+const ErrorMessage = styled.p`
+    color: red;
+    font-size: 0.8rem;
+    margin: 0 0 1rem 0;
+`;
+
+//Login Form Schema
+const LoginSchema = Yup.object().shape({
+    email: Yup.string()
+        .email('Invalid email')
+        .required('Required'),
+    password: Yup.string()
+        .min(8, 'Password must be at least 6 characters')
+        .required('Required'),
+});
+
+//Config call API login
+const url = process.env.REACT_APP_API_URL + '/login';
+
+ async function getLoginAccount(data: any) {
+    return await axiosClient.post(url, data)
+}
+
 const Login: React.FC = () => {
+    const loginForm = useFormik({
+        initialValues: {
+            email: '',
+            password: ''
+        },
+        onSubmit: values => {
+            //Handle action form submit
+            console.log(values)
+            const data = getLoginAccount(values);
+            data.then((res) => {
+                console.log(res)
+            })
+        },
+        validationSchema: LoginSchema
+    });
+
+    const {isAuthenticated, isInitialized, user} = useAuth();
+    console.log(isAuthenticated, isInitialized, user)
+
+
     return (
         <Wrapper>
-            <Form>
+            <Form onSubmit={loginForm.handleSubmit}>
                 <Image>
                     <img src="https://beetech.beeid.vn/images/logo.ico" alt="Logo"/>
                     <h1>BeeChat</h1>
                 </Image>
                 <FormWrapper>
                     <Title>Sign in to your account</Title>
-                    <Label>
+                    <Label htmlFor="email">
                         Email
                     </Label>
                     <Input
+                        id="email"
                         type="email"
                         name="email"
+                        placeholder='thang.pt@beetechsoft.vn'
+                        value={loginForm.values.email}
+                        onChange={loginForm.handleChange}
                     />
-                    <Label>
+                    {loginForm.touched.email && loginForm.errors.email && (
+                        <ErrorMessage>{loginForm.errors.email}</ErrorMessage>
+                    )}
+                    <Label htmlFor="password">
                         Password
                     </Label>
                     <Input
+                        id="password"
                         type="password"
                         name="password"
+                        value={loginForm.values.password}
+                        onChange={loginForm.handleChange}
+                        autoComplete='false'
                     />
-                    <Button>Submit</Button>
+                    {loginForm.touched.password && loginForm.errors.password && (
+                        <ErrorMessage>{loginForm.errors.password}</ErrorMessage>
+                    )}
+                    <Button type='submit'>Submit</Button>
                 </FormWrapper>
             </Form>
         </Wrapper>
