@@ -1,6 +1,7 @@
+import {createContext, FC, PropsWithChildren, useEffect, useMemo, useReducer} from "react";
 import {AuthContextType, AuthState} from "./types";
-import {createContext, FC, PropsWithChildren, useMemo, useReducer} from "react";
-import {AuthReducer} from "./reducers";
+import {AuthReducer, initialize} from "./reducers";
+import userService from "../../services/UserService";
 
 const initialState: AuthState = {
     isInitialized: false,
@@ -16,6 +17,32 @@ const AuthContext = createContext<AuthContextType>({
 const  AuthProvider: FC<PropsWithChildren> = ({children}) => {
     const [state, dispatch] = useReducer(AuthReducer, initialState)
     const authContextValue = useMemo(() => ({...state, dispatch}), [state]);
+
+    useEffect(() => {
+        (async () => {
+            const accessToken = localStorage.getItem('access_token');
+            if (!accessToken) {
+                return dispatch(initialize({
+                    isAuthenticated: false,
+                    user: null
+                }));
+            }
+            try {
+                const user = await userService.getUserProfile();
+                dispatch(initialize({
+                    isAuthenticated: true,
+                    user: user
+                }))
+            } catch {
+                dispatch(initialize({
+                    isAuthenticated: false,
+                    user: null
+                }))
+            }
+
+        })()
+    }, []);
+
     return (
         <AuthContext.Provider value={authContextValue}>
             {children}

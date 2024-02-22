@@ -1,4 +1,5 @@
 import {Dispatch} from "react";
+import {UserProfile} from "../../models";
 
 export enum AuthActionType {
     INITIALIZE = 'INITIALIZE',
@@ -8,7 +9,7 @@ export enum AuthActionType {
 export interface AuthState {
     isInitialized?: boolean
     isAuthenticated?: boolean,
-    user: User | null
+    user: UserProfile | User | null
 }
 
 export interface User {
@@ -18,7 +19,7 @@ export interface User {
     expires_at: string,
     first_name: string,
     last_name: string,
-    full_name: string
+    full_name?: string
 }
 
 export interface PayloadAction<T> {

@@ -2,8 +2,16 @@ import React from "react";
 import styled from "styled-components";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
-import axiosClient from "../../services/Axios";
+import {ToastContainer, toast, Bounce} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import authService from "../../services/AuthService";
+import {useNavigate} from "react-router-dom";
+import RoutePath from "../../config/Routes";
 import {useAuth} from "../../hooks/useAuth";
+import {signIn} from "../../context/auth/reducers";
+import {AuthState} from "../../context/auth/types";
+import {ParamsUserLogin} from "../../models";
+import {AxiosError} from "axios";
 
 const Wrapper = styled.section`
   margin-top: 20vh;
@@ -99,33 +107,61 @@ const LoginSchema = Yup.object().shape({
         .required('Required'),
 });
 
-//Config call API login
-const url = process.env.REACT_APP_API_URL + '/login';
-
- async function getLoginAccount(data: any) {
-    return await axiosClient.post(url, data)
-}
-
 const Login: React.FC = () => {
+    const navigate = useNavigate();
+    const {dispatch} = useAuth();
+    const initialValuesParams: ParamsUserLogin = {
+        email: '',
+        password: ''
+    }
     const loginForm = useFormik({
-        initialValues: {
-            email: '',
-            password: ''
-        },
-        onSubmit: values => {
-            //Handle action form submit
-            console.log(values)
-            const data = getLoginAccount(values);
-            data.then((res) => {
-                console.log(res)
-            })
+        initialValues: initialValuesParams,
+        onSubmit: async (values: ParamsUserLogin) => {
+            try {
+                //Handle action form submit
+                const data = await authService.Login(values);
+                //Save token to localStorage
+                localStorage.setItem('access_token', JSON.stringify(data?.access_token));
+                //Save user profile
+                data.full_name = `${data.first_name} ${data.last_name}`;
+                let dataUser: AuthState;
+                dataUser = {
+                    user: data
+                }
+                dispatch(signIn(dataUser))
+                toast("Login Successfully!", {
+                    position: "bottom-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                })
+                //Redirect to homepage
+                setTimeout(function () {
+                    navigate(RoutePath.HomePage);
+                }, 4000)
+            } catch (e: unknown) {
+                if (e instanceof AxiosError) {
+                    toast(e.response?.data.message, {
+                        position: "bottom-right",
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "light",
+                        transition: Bounce,
+                    });
+                }
+            }
         },
         validationSchema: LoginSchema
     });
-
-    const {isAuthenticated, isInitialized, user} = useAuth();
-    console.log(isAuthenticated, isInitialized, user)
-
 
     return (
         <Wrapper>
@@ -167,6 +203,7 @@ const Login: React.FC = () => {
                     <Button type='submit'>Submit</Button>
                 </FormWrapper>
             </Form>
+            <ToastContainer />
         </Wrapper>
     );
 }
