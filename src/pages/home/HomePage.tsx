@@ -12,9 +12,9 @@ function HomePage(): React.JSX.Element {
         return <Spinner/>
     }
 
-    if (isAuthenticated) {
-        return <Navigate to={RoutePath.HomePage}/>
-    }
+    // if (isAuthenticated) {
+    //     return <Navigate to={RoutePath.HomePage}/>
+    // }
 
     return (
         <DemoUseReducer/>
