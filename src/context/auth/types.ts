@@ -14,7 +14,7 @@ export interface AuthState {
 
 export interface User {
     user_id: bigint,
-    avatar: string,
+    avatar: string | null,
     email: string,
     expires_at: string,
     first_name: string,

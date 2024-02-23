@@ -7,10 +7,10 @@ import styled from "styled-components";
 const MainLayoutWrapper = styled.main`
   display: flex;
   .sidebar {
-    width: 15vw;
+    width: 17vw;
   }
   .content {
-    width: calc(100vw - 15vw);
+    width: calc(100vw - 17vw);
   }
 `;
 const MainLayout = () => {

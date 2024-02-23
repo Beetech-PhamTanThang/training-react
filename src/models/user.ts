@@ -2,7 +2,7 @@ export interface UserProfile {
     id: number;
     language: string;
     first_name: string;
-    avatar: string;
+    avatar: string | null;
     last_name: string;
     phone_number: string;
     gender: number;
@@ -47,7 +47,7 @@ export interface UserProfile {
 
 export interface AuthUser {
     access_token: string,
-    avatar: string,
+    avatar: string | null,
     email: string,
     expires_at: string,
     first_name: string,
