@@ -1,3 +1,5 @@
+import {number} from "yup";
+
 export interface ListConversation {
     conversation_id: number;
     message_id: number | null;
@@ -18,4 +20,14 @@ export interface ListConversation {
     invite_link: string | null;
     encrypt_conversation_id: string | null;
     most_recent_message: string | null;
+}
+type TypeConversation = {
+    'GROUP_CHAT': number,
+    'MY_CHAT': number,
+    'TWO_USER': number
+}
+export const TYPE_CONVERSATION: TypeConversation = {
+    'GROUP_CHAT' : 0,
+    'MY_CHAT': 1,
+    'TWO_USER': 2
 }

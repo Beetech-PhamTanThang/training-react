@@ -5,7 +5,7 @@ import {MdDarkMode, MdLightMode} from "react-icons/md";
 import styled from "styled-components";
 import RoutePath from "../config/Routes";
 import {Link} from "react-router-dom";
-
+import {useAuth} from "../hooks/useAuth";
 
 const Label = styled.label`
   display: flex;
@@ -55,6 +55,7 @@ const SpanShowResult = styled.span`
 `;
 const Header = () => {
     const {theme, setTheme} = useContext(ThemeContext);
+    const {isAuthenticated} = useAuth();
 
     //Function switch theme
     const toggleSwitchTheme = () => {
@@ -69,7 +70,7 @@ const Header = () => {
             <SpanShowResult>Chế độ tối: {theme === DARK_MODE ? 'Bật' : 'Tắt'}</SpanShowResult>
             <Input checked={theme === DARK_MODE} type="checkbox" onChange={toggleSwitchTheme}/>
             <Switch/>
-            <Link to={RoutePath.Login}>Login</Link>
+            { !isAuthenticated ? <Link to={RoutePath.Login}>Login</Link> : ''}
         </Label>
     );
 }

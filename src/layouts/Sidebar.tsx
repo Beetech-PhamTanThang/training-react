@@ -5,8 +5,10 @@ import UserAvatar from "../components/UserAvatar";
 import { BsPinFill } from "react-icons/bs";
 import { IoMdNotifications, IoMdNotificationsOff } from "react-icons/io";
 import conversationService from "../services/ConversationService";
-import {ListConversation} from "../models";
+import {ListConversation, TYPE_CONVERSATION} from "../models";
 import moment from 'moment'
+import {useSearchParams} from "react-router-dom";
+import {filter} from "lodash";
 
 const StyleTitleSidebar = styled.h1`
   font-weight: bold;
@@ -16,6 +18,7 @@ const WrapperUserAvatar = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: 1rem;
 
   span {
     font-weight: 600;
@@ -30,6 +33,7 @@ const StyledChatItems = styled.div`
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   border-bottom: 1px solid rosybrown;
+  padding: .5rem 0;
   
   .chat-name {
     display: flex;
@@ -64,12 +68,19 @@ const StyledChatItems = styled.div`
 const Sidebar = () => {
     const {user, isAuthenticated, isInitialized} = useAuth();
     const [listConversation, setListConversation] = useState<ListConversation[]>();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         async function getDataListConversation() {
             const dataListConversation = await conversationService.getListConversation();
             setListConversation(dataListConversation)
-            console.log(listConversation)
+            let myChatConversation = listConversation?.find(conversationItem => conversationItem.type === TYPE_CONVERSATION.MY_CHAT);
+            if (myChatConversation) {
+                //Handle push param conversation to url -> get data conversation
+                setSearchParams(`?${new URLSearchParams({
+                    'conversationId' : myChatConversation.conversation_id.toString()
+                })}`)
+            }
         }
         getDataListConversation();
     }, [isAuthenticated, user]);
